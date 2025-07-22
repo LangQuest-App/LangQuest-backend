@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { generateCourseWithTTS } from "../controllers/lesson-controller/generate-lesson";
 import getLessonsOfUser from "../controllers/lesson-controller/get-lessons";
+import { updateMistakesandStatus } from "../controllers/lesson-controller/update_mistakes";
 
 const router = Router();
 // dummy data to simulate
@@ -25,6 +26,21 @@ router.post("/generate", async (req, res) => {
     return res.status(500).json({ status: "error", message: "Internal server error", error: err });
   }
 });
+router.post("/update", async (req, res) => {
+  const data = req.body
+  console.log(data.lesson_id)
+  try {
+    const response = await updateMistakesandStatus(data);
+    console.log(response)
+    return res.json({
+      status: 200,
+      data: response
+    });
+  } catch (err) {
+    return res.status(500).json({ status: "error", message: "Internal server error", error: err });
+  }
+});
+
 router.get("/get/:id", async (req, res) => {
   const {id} = req.params;
   try {

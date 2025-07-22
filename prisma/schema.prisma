@@ -20,6 +20,16 @@ model Lesson {
   user      User     @relation(fields: [userId], references: [id])
   title     String
   questions Json     // Array of LessonQuestion objects
+  mistakes  Mistakes[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Mistakes{
+  id        String   @id @default(uuid())
+  lessonId  String   
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  questions Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
