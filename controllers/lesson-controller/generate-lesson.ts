@@ -4,12 +4,13 @@ import { IUserPreference } from "../../types/user";
 import { Lesson } from "../../generated/prisma";
 import { lessonPrompt } from "../../prompt/lesson";
 import getVoiceID from "../../utils/getVoiceId";
+import { PrismaClient } from "../../generated/prisma";
 
 dotenv.config();
 
 const GOOGLE_KEY = process.env.GOOGLE_API_KEY;
 const MURF_API_KEY = process.env.MURF_API_KEY;
-
+const prisma = new PrismaClient();
 // Generate TTS audio using Murf API
 async function generateTTS(phrase: string, voiceID: string) {
   try {
@@ -90,7 +91,7 @@ async function injectTTS(lessons: Lesson[], voiceID: string) {
  */
 
 // Main function to generate lesson course with TTS
-export async function generateCourseWithTTS(data: IUserPreference) {
+export async function generateCourseWithTTS(data: IUserPreference & {userId:string}) {
   try {
     if (!GOOGLE_KEY) {
       return {
@@ -113,7 +114,20 @@ export async function generateCourseWithTTS(data: IUserPreference) {
 
     const updatedLessons = await injectTTS(parsed.lessons, voiceID);
 
+    
+    for (const lesson of updatedLessons) {
+      await prisma.lesson.create({
+      data: {
+        userId: 3,
+        title: lesson.title,
+        questions: lesson.questions!
+      },
+      });
+    }
+
+    await prisma.$disconnect();
     return { lessons: updatedLessons };
+
   } catch (error) {
     console.error("Error generating course:", error);
     return null;

@@ -15,6 +15,7 @@ You will create a **spoken language course** with **5 lessons**, each containing
 - Reuse and reinforce earlier words in later lessons (recursive learning).
 - Follow a Duolingo-style flow (simple question → hear phrase → respond).
 - ✅ At least **half of the questions in each lesson** should be of type **"multiple_choice"**.
+- Do NOT use original script of the target language — only phonetic transliteration using the learner's native script.
 
 📘 Lesson Structure:
 Return a JSON object of the following shape:
@@ -26,14 +27,18 @@ Return a JSON object of the following shape:
 Each Lesson has:
 - "title": string — e.g. "Lesson 1: Greetings"
 - "questions": Question[]
+-"attempted": default value false (a boolean feild)
 
 Each Question has:
 - "question": string — Instruction or prompt in the native language.
-- "phonetic": string — Key target phrase in Latin letters (transliteration).
+- "phonetic": string — Key target phrase in "${data.language_to_learn}" letters (transliteration).
 - "tts_url": string — Just use placeholder e.g. "TTS_URL_FOR_PHRASE"
 - "answer_type": "multiple_choice" | "text_input"
-- "correct_answer": string — In native language
-- "options": string[] — Only if answer_type is "multiple_choice"
+- "correct_answer": string — The phrase from the learning language, written **phonetically using the script of the learner’s native language** (e.g., write Bengali words like “Shubho shokal” as “शुभो शोकाल” in Devanagari if native language is Hindi).
+
+- "options": string[] — Only if answer_type is "multiple_choice". Write all options as **phonetic transliterations of the learning language**, using **the script of the native language** (e.g., Devanagari).
+
+
 
 ❌ DO NOT:
 - Do not use any text or letters from the target language.

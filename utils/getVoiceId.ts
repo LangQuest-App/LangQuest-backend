@@ -1,8 +1,3 @@
-// it-IT-giorgio-italian
-// hi-IN-rahul-hindi
-// en-IN-eashwar-english
-// bn-IN-abhik--bengali
-// ta-IN-iniya-tamil
 export default function getVoiceID(native_language:string){
 
     switch (native_language) {

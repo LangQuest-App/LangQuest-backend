@@ -13,6 +13,7 @@ export type Lesson = {
   id: string;
   userId: string;
   title: string;
+  attempted:boolean;
   questions: LessonQuestion[];
   createdAt: Date;
   updatedAt: Date;
