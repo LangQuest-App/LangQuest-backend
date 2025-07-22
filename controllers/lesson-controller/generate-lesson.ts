@@ -10,15 +10,15 @@ dotenv.config();
 const GOOGLE_KEY = process.env.GOOGLE_API_KEY;
 const MURF_API_KEY = process.env.MURF_API_KEY;
 
-async function generateTTS(phrase:string,voiceID:string) {
+// Generate TTS audio using Murf API
+async function generateTTS(phrase: string, voiceID: string) {
   try {
-    console.log(voiceID)
     const response = await fetch("https://api.murf.ai/v1/speech/generate", {
       method: "POST",
-      headers: new Headers({
+      headers: {
         "api-key": MURF_API_KEY || "",
         "Content-Type": "application/json",
-      }),
+      },
       body: JSON.stringify({
         text: phrase,
         voiceId: voiceID,
@@ -34,8 +34,17 @@ async function generateTTS(phrase:string,voiceID:string) {
   }
 }
 
-// Utility: Inject TTS into each question
-async function injectTTS(lessons:Lesson[],voiceID:string) {
+// Inject TTS URLs into lesson questions (Optimized version using Promise.all)
+/**
+ * Optimization Note:
+ * This function uses parallel TTS generation to significantly reduce total response time.
+ * Previously, each TTS call waited for the previous one to finish (sequential execution),
+ * which took a long time (e.g., 50 questions × 2s = ~100s).
+ * 
+ * Now, all TTS requests run in parallel using Promise.all, so total time is much faster (~30s).
+ * If Murf API rate limits in future, you can add concurrency control using `p-limit`.
+ */
+async function injectTTS(lessons: Lesson[], voiceID: string) {
   type Question = {
     question: string;
     phonetic: string;
@@ -44,41 +53,65 @@ async function injectTTS(lessons:Lesson[],voiceID:string) {
     correct_answer: string;
     options?: string[];
   };
+
+  const ttsTasks: Promise<void>[] = [];
+
   for (const lesson of lessons) {
     const questions = lesson.questions as Question[];
+
     for (const question of questions) {
-      const tts = await generateTTS(question.phonetic,voiceID);
-      question.tts_url = tts;
+      const task = generateTTS(question.phonetic, voiceID).then((ttsUrl) => {
+        question.tts_url = ttsUrl;
+      });
+      ttsTasks.push(task);
     }
   }
+
+  await Promise.all(ttsTasks); // Run all TTS calls in parallel
   return lessons;
 }
 
-// Main function
-export async function generateCourseWithTTS(data:IUserPreference) {
+/**
+ * slower Version (Sequential)
+ * 
+ * This version made one TTS request at a time, which is slow.
+ * Each `await` would block the next call.
+ *
+ * async function injectTTS(lessons: Lesson[], voiceID: string) {
+ *   for (const lesson of lessons) {
+ *     const questions = lesson.questions as Question[];
+ *     for (const question of questions) {
+ *       const tts = await generateTTS(question.phonetic, voiceID);
+ *       question.tts_url = tts;
+ *     }
+ *   }
+ *   return lessons;
+ * }
+ */
+
+// Main function to generate lesson course with TTS
+export async function generateCourseWithTTS(data: IUserPreference) {
   try {
     if (!GOOGLE_KEY) {
-        console.log("NO key")
       return {
         status: "401",
-        data: "Please get an API key before accessing gemini model",
+        data: "Please get an API key before accessing Gemini model",
       };
     }
+
     const genAI = new GoogleGenerativeAI(GOOGLE_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const systemPrompt = lessonPrompt(data);
-
     const result = await model.generateContent(systemPrompt);
+
     let raw = result.response.text();
     raw = raw.replace(/```json|```|\n/g, "").trim();
 
     const parsed = JSON.parse(raw);
-    console.log(parsed); 
-    console.log(typeof parsed);
-    let voiceID = getVoiceID(data.native_lang)
-    console.log("voice id",voiceID)
-    const updatedLessons = await injectTTS(parsed.lessons,voiceID);
+    const voiceID = getVoiceID(data.native_lang);
+
+    const updatedLessons = await injectTTS(parsed.lessons, voiceID);
 
     return { lessons: updatedLessons };
   } catch (error) {
