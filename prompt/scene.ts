@@ -1,5 +1,5 @@
 export function scene(language : string) {
-  return `You are an AI language tutor. Generate a conversational scene in the given language, the language is ${language}.
+  return `You are an AI language tutor. Generate a conversational scene, create a random scene of you own (like ordering in cafe, asking something to a stranger etc.) in the given language, the language is ${language}.
 
 Instructions:
 1. The scene should have a clear title and a short description
