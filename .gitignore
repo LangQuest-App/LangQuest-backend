@@ -3,5 +3,7 @@ node_modules
 .env
 
 /generated/prisma
+
 /dist
 output.json
+
