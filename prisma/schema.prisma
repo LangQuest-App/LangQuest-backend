@@ -61,6 +61,7 @@ model ScriptLine {
   speaker       String
   text          String
   answer        String?
+  audioUrl      String?       // New field to store audio URL
   scene         Scene         @relation(fields: [sceneId], references: [id])
   userResponses UserResponse[]
 }
