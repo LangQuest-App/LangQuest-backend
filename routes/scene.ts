@@ -118,12 +118,9 @@ sceneRouter.post("/", async (req, res) => {
   }
 });
 
-// GET endpoint to retrieve the latest scene with all script lines and audio URLs
 sceneRouter.get("/", async (req, res) => {
   try {
-    console.log("📋 Fetching latest scene from database...");
 
-    // Get the most recent scene with all script lines ordered by creation date
     const latestScene = await prisma.scene.findFirst({
       orderBy: {
         createdAt: 'desc'
@@ -148,7 +145,6 @@ sceneRouter.get("/", async (req, res) => {
       createdAt: latestScene.createdAt
     });
 
-    // Format response to match the POST endpoint structure
     const formattedResponse = {
       sceneId: latestScene.id,
       title: latestScene.title,
@@ -165,17 +161,9 @@ sceneRouter.get("/", async (req, res) => {
         voiceId: line.audioUrl ? "en-US-natalie" : null
       }))
     };
-
-    console.log("📊 Response stats:", {
-      totalLines: formattedResponse.scriptLines.length,
-      linesWithAudio: formattedResponse.scriptLines.filter(line => line.voiceUrl).length,
-      linesWithoutAudio: formattedResponse.scriptLines.filter(line => !line.voiceUrl).length
-    });
-
     res.json(formattedResponse);
 
   } catch (error) {
-    console.error("💥 Error fetching latest scene:", error);
     console.error("Error details:", {
       message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
