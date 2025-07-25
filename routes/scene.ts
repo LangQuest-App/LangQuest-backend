@@ -118,6 +118,77 @@ sceneRouter.post("/", async (req, res) => {
   }
 });
 
+// GET endpoint to retrieve the latest scene with all script lines and audio URLs
+sceneRouter.get("/", async (req, res) => {
+  try {
+    console.log("📋 Fetching latest scene from database...");
+
+    // Get the most recent scene with all script lines ordered by creation date
+    const latestScene = await prisma.scene.findFirst({
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        scriptLines: {
+          orderBy: { order: 'asc' }
+        }
+      }
+    });
+
+    if (!latestScene) {
+      console.log("❌ No scenes found in database");
+      return res.status(404).json({ error: "No scenes found in database" });
+    }
+
+    console.log("✅ Latest scene found:", {
+      sceneId: latestScene.id,
+      title: latestScene.title,
+      language: latestScene.language,
+      scriptLinesCount: latestScene.scriptLines.length,
+      createdAt: latestScene.createdAt
+    });
+
+    // Format response to match the POST endpoint structure
+    const formattedResponse = {
+      sceneId: latestScene.id,
+      title: latestScene.title,
+      description: latestScene.description,
+      language: latestScene.language,
+      createdAt: latestScene.createdAt,
+      scriptLines: latestScene.scriptLines.map(line => ({
+        scriptLineId: line.id,
+        order: line.order,
+        speaker: line.speaker,
+        text: line.text,
+        answer: line.answer,
+        voiceUrl: line.audioUrl,
+        voiceId: line.audioUrl ? "en-US-natalie" : null
+      }))
+    };
+
+    console.log("📊 Response stats:", {
+      totalLines: formattedResponse.scriptLines.length,
+      linesWithAudio: formattedResponse.scriptLines.filter(line => line.voiceUrl).length,
+      linesWithoutAudio: formattedResponse.scriptLines.filter(line => !line.voiceUrl).length
+    });
+
+    res.json(formattedResponse);
+
+  } catch (error) {
+    console.error("💥 Error fetching latest scene:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      type: error?.constructor?.name
+    });
+    
+    res.status(500).json({ 
+      error: "Failed to fetch latest scene",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+});
+
 async function generateVoiceWithMurf(text: string, language: string, speaker: string) {
   const murfApiKey = process.env.MURF_API_KEY;
   
