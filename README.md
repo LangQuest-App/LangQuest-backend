@@ -247,9 +247,11 @@ All API responses follow this structure:
 
 This project is licensed under the ISC License.
 
-## 👨‍💻 Author
+## 👨‍💻 Authors
 
 **Dev-Dhruba** - [GitHub Profile](https://github.com/Dev-Dhruba)
+
+**Shreya Shaw** - [GitHub Profile](https://github.com/shreyashaw05)
 
 ## 🔗 Related Projects
 
