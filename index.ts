@@ -11,8 +11,19 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    console.log("hii")
-    res.send('Hello, World!');
+    console.log("Health check")
+    res.json({ 
+        message: 'LangQuest Backend API is running!',
+        timestamp: new Date().toISOString(),
+        status: 'healthy'
+    });
+});
+
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok',
+        timestamp: new Date().toISOString()
+    });
 });
 app.use('/scene', sceneRouter);
 app.use('/lesson', lessonRouter);
