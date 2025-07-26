@@ -4,6 +4,7 @@ import { IUserPreference } from "../../types/user";
 import { PrismaClient } from "@prisma/client";
 import { lessonPrompt } from "../../prompt/lesson";
 import getVoiceID from "../../utils/getVoiceId";
+import { prisma } from "../../utils/prisma";
 
 // Custom interface for Lesson used in this file
 interface Lesson {
@@ -17,7 +18,6 @@ dotenv.config();
 
 const GOOGLE_KEY = process.env.GOOGLE_API_KEY;
 const MURF_API_KEY = process.env.MURF_API_KEY;
-const prisma = new PrismaClient();
 // Generate TTS audio using Murf API
 async function generateTTS(phrase: string, voiceID: string) {
   try {

@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { PrismaClient } from "@prisma/client";
+import { prisma } from "../utils/prisma";
 
 import { scene } from "../prompt/scene";
 
@@ -9,7 +10,6 @@ dotenv.config();
 
 const sceneRouter = express.Router();
 const apiKey = process.env.GOOGLE_API_KEY;
-const prisma = new PrismaClient();
 
 interface ScriptLineInput {
   order: number;

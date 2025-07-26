@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../utils/prisma";
 
 interface MistakesData {
     lesson_id: string;
@@ -6,7 +7,6 @@ interface MistakesData {
 }
 
 export async function updateMistakesandStatus(data: MistakesData){
-    const prisma = new PrismaClient();
     try {
         // update the lesson's status to attempted
         const lessonID = data.lesson_id;
@@ -25,7 +25,5 @@ export async function updateMistakesandStatus(data: MistakesData){
         return { success: true };
     } catch (error:any) {
         return { success: false, error: error.message || error };
-    } finally {
-        await prisma.$disconnect();
     }
 }
