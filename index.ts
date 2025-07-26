@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { sceneRouter } from './routes/scene'
 import lessonRouter from "./routes/lesson"
+import { userResponseRouter } from './routes/userResponse'
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.get('/', (req, res) => {
 });
 app.use('/scene', sceneRouter);
 app.use('/lesson', lessonRouter);
+app.use('/userResponse', userResponseRouter);
 
 const PORT = process.env.PORT || 3000;
 

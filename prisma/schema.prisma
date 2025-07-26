@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -39,7 +38,6 @@ model User {
   name           String
   email          String          @unique
   createdAt      DateTime        @default(now())
-  userResponses  UserResponse[]
   preferences    Json
   progresses     Progress[]
   lessons        Lesson[]        // Relation: one user can have many lessons
@@ -68,11 +66,9 @@ model ScriptLine {
 
 model UserResponse {
   id           Int           @id @default(autoincrement())
-  userId       Int
   scriptLineId Int
   response     String
   createdAt    DateTime      @default(now())
-  user         User          @relation(fields: [userId], references: [id])
   scriptLine   ScriptLine    @relation(fields: [scriptLineId], references: [id])
 }
 
