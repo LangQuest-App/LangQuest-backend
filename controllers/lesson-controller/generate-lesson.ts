@@ -1,10 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 import { IUserPreference } from "../../types/user";
-import { Lesson } from "../../generated/prisma";
+import { Lesson, PrismaClient } from "@prisma/client";
 import { lessonPrompt } from "../../prompt/lesson";
 import getVoiceID from "../../utils/getVoiceId";
-import { PrismaClient } from "../../generated/prisma";
 
 dotenv.config();
 

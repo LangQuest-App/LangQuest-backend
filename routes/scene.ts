@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 import { scene } from "../prompt/scene";
 
@@ -60,7 +60,7 @@ sceneRouter.post("/", async (req, res) => {
     });
 
     const scriptLinesWithVoice = await Promise.all(
-      createdScene.scriptLines.map(async (line) => {
+      createdScene.scriptLines.map(async (line: {id: number, text: string, speaker: string, order: number, answer: string | null}) => {
         try {
           
           const voiceData = await generateVoiceWithMurf(line.text, language, line.speaker);
@@ -151,7 +151,7 @@ sceneRouter.get("/", async (req, res) => {
       description: latestScene.description,
       language: latestScene.language,
       createdAt: latestScene.createdAt,
-      scriptLines: latestScene.scriptLines.map(line => ({
+      scriptLines: latestScene.scriptLines.map((line: {id: number, order: number, speaker: string, text: string, answer: string | null, audioUrl: string | null}) => ({
         scriptLineId: line.id,
         order: line.order,
         speaker: line.speaker,

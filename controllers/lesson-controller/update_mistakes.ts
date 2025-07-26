@@ -1,6 +1,11 @@
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
-export async function updateMistakesandStatus(data:any){
+interface MistakesData {
+    lesson_id: string;
+    questions: any;
+}
+
+export async function updateMistakesandStatus(data: MistakesData){
     const prisma = new PrismaClient();
     try {
         // update the lesson's status to attempted
