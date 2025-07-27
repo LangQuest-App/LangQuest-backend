@@ -5,6 +5,6 @@ node_modules
 /generated/prisma
 
 # Uncomment the line below if you want to exclude dist from git
-# /dist
+/dist
 output.json
 

@@ -1,3 +1,4 @@
+import { getMistakesOfLesson, getAllMistakes } from "../controllers/lesson-controller/get-mistakes";
 import { Router } from "express";
 import { generateCourseWithTTS } from "../controllers/lesson-controller/generate-lesson";
 import getLessonsOfUser from "../controllers/lesson-controller/get-lessons";
@@ -54,4 +55,22 @@ router.get("/get/:id", async (req, res) => {
   }
 });
 
+router.get("/:id/get-mistake", async (req, res) => {
+  const lessonId = req.params.id;
+  try {
+    const mistakes = await getMistakesOfLesson(lessonId);
+    return res.json({ status: 200, data: mistakes });
+  } catch (err) {
+    return res.status(500).json({ status: "error", message: "Internal server error", error: err });
+  }
+});
+
+router.get("/get-all-mistakes", async (req, res) => {
+  try {
+    const mistakes = await getAllMistakes();
+    return res.json({ status: 200, data: mistakes });
+  } catch (err) {
+    return res.status(500).json({ status: "error", message: "Internal server error", error: err });
+  }
+});
 export default router;
